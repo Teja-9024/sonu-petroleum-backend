@@ -46,6 +46,8 @@ export const loginUser = async (req: Request, res: Response) => {
         id: user._id,
         email: user.email,
         role: user.role,
+        name :user.name,
+        van: user.van,
         createdAt: user.createdAt,
       }
     });
@@ -57,7 +59,7 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const registerUser = async (req: Request, res: Response) => {
-  const { email, password, role } = req.body;
+  const { email, password, role, name, van } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -78,7 +80,9 @@ export const registerUser = async (req: Request, res: Response) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      role
+      role,
+      name,
+      van
     });
 
     await newUser.save();
@@ -89,6 +93,8 @@ export const registerUser = async (req: Request, res: Response) => {
         id: newUser._id,
         email: newUser.email,
         role: newUser.role,
+        name :newUser.name,
+        van: newUser.van,
         createdAt: newUser.createdAt
       }
     });
