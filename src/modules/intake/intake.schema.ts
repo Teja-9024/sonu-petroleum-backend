@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const intakeSchema = z.object({
   body: z.object({
-    // vanNo: z.string().min(1, "Van is required"),
+    vanNo: z.string().min(1, "Van is required").optional(),
     // worker: z.string().min(1, "Worker name is required"),
     pumpName: z.string().min(1, "Pump name is required"),
     litres: z.number().min(1, "Litres must be positive"),
