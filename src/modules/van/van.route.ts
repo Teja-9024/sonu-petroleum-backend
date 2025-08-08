@@ -7,8 +7,5 @@ const router = express.Router();
 
 router.post("/create-van", validateRequest(vanSchema), createVan);
 router.get("/vans", getVans);
-// router.get("/:id", getVanById);
-// router.put("/:id", validateRequest(vanSchema), updateVan);
-// router.delete("/:id", deleteVan);
 
 export default router;

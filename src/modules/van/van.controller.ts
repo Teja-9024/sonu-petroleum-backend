@@ -36,33 +36,3 @@ export const getVans = async (_req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching vans", error });
   }
 };
-
-// export const getVanById = async (req: Request, res: Response) => {
-//   try {
-//     const van = await Van.findById(req.params.id);
-//     if (!van) return res.status(404).json({ message: "Van not found" });
-//     res.status(200).json(van);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching van", error });
-//   }
-// };
-
-// export const updateVan = async (req: Request, res: Response) => {
-//   try {
-//     const van = await Van.findByIdAndUpdate(req.params.id, req.body, { new: true });
-//     if (!van) return res.status(404).json({ message: "Van not found" });
-//     res.status(200).json({ message: "Van updated successfully", van });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error updating van", error });
-//   }
-// };
-
-// export const deleteVan = async (req: Request, res: Response) => {
-//   try {
-//     const van = await Van.findByIdAndDelete(req.params.id);
-//     if (!van) return res.status(404).json({ message: "Van not found" });
-//     res.status(200).json({ message: "Van deleted successfully" });
-//   } catch (error) {
-//     res.status(500).json({ message: "Error deleting van", error });
-//   }
-// };

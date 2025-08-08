@@ -6,9 +6,5 @@ import { intakeSchema } from "./intake.schema";
 const router = express.Router();
 
 router.post("/add-intake", validateRequest(intakeSchema), addIntake);
-// router.get("/", getIntakes);
-// router.get("/:id", getIntakeById);
-// router.put("/:id", validateRequest(intakeSchema), updateIntake);
-// router.delete("/:id", deleteIntake);
 
 export default router;
