@@ -3,7 +3,7 @@ import { Van } from "./van.model";
 
 export const createVan = async (req: Request, res: Response) => {
     try {
-        const { vanNo, name, worker,capacity } = req.body;
+        const { vanNo, name,capacity } = req.body;
 
         const existing = await Van.findOne({ vanNo });
         if (existing) {
@@ -13,12 +13,12 @@ export const createVan = async (req: Request, res: Response) => {
         const newVan = new Van({
             vanNo,
             name,
-            worker,
             capacity:capacity,
             currentDiesel: 0,
             totalFilled: 0,
             totalDelivered: 0,
-            morningStock:0
+            morningStock:0,
+            assignedWorker: null
         });
         await newVan.save();
 
@@ -36,3 +36,4 @@ export const getVans = async (_req: Request, res: Response) => {
     res.status(500).json({ message: "Error fetching vans", error });
   }
 };
+

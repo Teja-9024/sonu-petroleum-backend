@@ -1,8 +1,10 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IIntake extends Document {
+  van: Types.ObjectId;
   vanNo: string;
-  worker: string;
+  worker: Types.ObjectId;
+  workerName: string; 
   pumpName: string;
   litres: number;
   amount: number; 
@@ -11,8 +13,10 @@ export interface IIntake extends Document {
 }
 
 const IntakeSchema: Schema<IIntake> = new Schema({
+  van: { type: Schema.Types.ObjectId, ref: "Van", required: true },
   vanNo: { type: String, required: true },
-  worker: { type: String, required: true },
+  worker: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  workerName: { type: String, required: true },
   pumpName: { type: String, required: true },
   litres: { type: Number, required: true },
   amount: { type: Number, required: true },
@@ -21,3 +25,4 @@ const IntakeSchema: Schema<IIntake> = new Schema({
 });
 
 export const Intake = mongoose.model<IIntake>("Intake", IntakeSchema);
+

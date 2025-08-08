@@ -1,8 +1,10 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IDelivery extends Document {
+  van: Types.ObjectId;
   vanNo: string;
-  worker: string;
+  worker: Types.ObjectId;
+  workerName: string;
   supplier: string;
   customer: string;
   litres: number;
@@ -13,7 +15,8 @@ export interface IDelivery extends Document {
 
 const DeliverySchema: Schema<IDelivery> = new Schema({
   vanNo: { type: String, required: true },
-  worker: { type: String, required: true },
+  worker: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  workerName: { type: String, required: true },
   supplier: { type: String, required: true },
   customer: { type: String, required: true },
   litres: { type: Number, required: true },
