@@ -4,6 +4,7 @@ import { Van } from "../van/van.model";
 import { AuthedRequest } from "../../middleware/auth";
 import { User } from "../user/user.model";
 import { sendExpoPush } from "../../services/push.service";
+import { createOwnerNotifications } from "../notifications/notification.service";
 
 export const createDelivery = async (req: AuthedRequest, res: Response) => {
   try {
@@ -45,7 +46,22 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
     { $inc: { currentDiesel: -litres, totalDelivered: litres } }
   );
 
-  const owners = await User.find({
+
+    await createOwnerNotifications({
+      title: "New Delivery Recorded",
+      body: `${workerDoc?.name ?? "Worker"} delivered ${litres} L from ${van.vanNo} to ${customer}`,
+      data: {
+        type: "delivery",
+        vanNo: van.vanNo,
+        litres,
+        amount,
+        supplier,
+        customer,
+        dateTime: (dateTime ? new Date(dateTime) : new Date()).toISOString(),
+      }
+    });
+
+    const owners = await User.find({
       role: "owner",
       expoPushTokens: { $exists: true, $ne: [] }
     }).select("expoPushTokens");

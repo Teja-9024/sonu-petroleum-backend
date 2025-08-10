@@ -4,6 +4,7 @@ import { Van } from "../van/van.model";
 import { AuthedRequest } from "../../middleware/auth";
 import { User } from "../user/user.model";
 import { sendExpoPush } from "../../services/push.service";
+import { createOwnerNotifications } from "../notifications/notification.service";
 
 export const addIntake = async (req: AuthedRequest, res: Response) => {
   try {
@@ -42,6 +43,22 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
       { $inc: { currentDiesel: litres, totalFilled: litres } }
     );  
 
+
+    // 1) DB inbox create
+    await createOwnerNotifications({
+      title: "New Intake Recorded",
+      body: `${workerDoc?.name ?? "Worker"} filled ${litres} L in ${van.vanNo} (${pumpName})`,
+      data: {
+        type: "intake",
+        vanNo: van.vanNo,
+        litres,
+        amount,
+        pumpName,
+        dateTime: (dateTime ? new Date(dateTime) : new Date()).toISOString(),
+      }
+    });
+
+    // 2) Push to owners
     const owners = await User.find({ role: "owner", expoPushTokens: { $exists: true, $ne: [] } })
       .select("expoPushTokens");
     const tokens = owners.flatMap(o => o.expoPushTokens);
