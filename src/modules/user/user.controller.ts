@@ -6,7 +6,7 @@ import { env } from "../../config/env";
 import { Van } from "../van/van.model";
 import mongoose from "mongoose";
 
-const ACCESS_TOKEN_EXPIRY = "15m";
+const ACCESS_TOKEN_EXPIRY = "7d";
 const REFRESH_TOKEN_EXPIRY = "7d";
 
 export const loginUser = async (req: Request, res: Response) => {

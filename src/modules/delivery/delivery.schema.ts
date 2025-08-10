@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { optional, z } from "zod";
 
 export const deliverySchema = z.object({
   body: z.object({
@@ -8,7 +8,7 @@ export const deliverySchema = z.object({
     customer: z.string().min(1, "Customer name is required"),
     litres: z.number().min(1, "Litres must be positive"),
     amount: z.number().min(1, "Amount must be positive"),
-    dateTime: z.string().min(1, "Time is required"),
+    dateTime: z.string().min(1, "Time is required").optional(),
   })
 });
 

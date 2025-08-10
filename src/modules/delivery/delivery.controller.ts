@@ -50,3 +50,36 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
   }
 };
 
+
+export const getDeliveries = async (req: AuthedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const query: any = {};
+
+    // Worker → sirf apni van
+    if (req.user.role === "worker") {
+      if (!req.user.vanId) {
+        return res.status(400).json({ message: "Worker has no van assigned" });
+      }
+      query.van = req.user.vanId;
+    }
+    // Owner → query empty => sab vans ki deliveries
+   console.log("req.user.role",query)
+    const deliveries = await Delivery.find(query)
+      .populate("van", "vanNo name")       // van info
+      .populate("worker", "name email")    // worker info
+      .sort({ dateTime: -1 });             // latest first
+
+    return res.json({
+      count: deliveries.length,
+      data: deliveries
+    });
+  } catch (error) {
+    console.error("Error fetching deliveries:", error);
+    return res.status(500).json({ message: "Error fetching deliveries", error });
+  }
+};
+

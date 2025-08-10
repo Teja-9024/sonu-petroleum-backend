@@ -9,10 +9,10 @@ import deliveryRoutes from "../modules/delivery/delivery.route";
 const router = express.Router();
 
 router.use("/api/users", userRoutes);
-router.use("/api", dieselRateRoutes);
-router.use("/api", vanRoutes);
-router.use("/api", intakeRoutes);
-router.use("/api", deliveryRoutes);
+router.use("/api/fuel-rates", dieselRateRoutes);
+router.use("/api/vans", vanRoutes);
+router.use("/api/intakes", intakeRoutes);
+router.use("/api/deliveries", deliveryRoutes);
 // router.use("/api/intakes", intakeRoutes);
 // router.use("/api/deliveries", deliveryRoutes);
 // router.use("/api/notifications", notificationRoutes);

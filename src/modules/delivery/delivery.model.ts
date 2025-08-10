@@ -14,6 +14,7 @@ export interface IDelivery extends Document {
 }
 
 const DeliverySchema: Schema<IDelivery> = new Schema({
+  van: { type: Schema.Types.ObjectId, ref: "Van", required: true },
   vanNo: { type: String, required: true },
   worker: { type: Schema.Types.ObjectId, ref: "User", required: true },
   workerName: { type: String, required: true },

@@ -48,3 +48,37 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
 };
 
 
+export const getIntakes = async (req: AuthedRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    let query: any = {};
+
+    if (req.user.role === "worker") {
+      if (!req.user.vanId) {
+        return res.status(400).json({ message: "Worker has no van assigned" });
+      }
+      query.van = req.user.vanId; // ✅ sirf apni van ka data
+    }
+    // ✅ owner ka query empty rahega → sab vans ka data milega
+    console.log("intake query: ", query)
+
+    const intakes = await Intake.find(query)
+      .populate("van", "vanNo name")     // Van info
+      .populate("worker", "name email")  // Worker info
+      .sort({ dateTime: -1 });            // Latest first
+
+    return res.json({
+      count: intakes.length,
+      data: intakes
+    });
+  } catch (error) {
+    console.error("Error fetching intakes:", error);
+    return res.status(500).json({ message: "Error fetching intakes", error });
+  }
+};
+
+
+
