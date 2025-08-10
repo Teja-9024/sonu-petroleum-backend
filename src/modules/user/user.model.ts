@@ -7,6 +7,7 @@ export interface IUser extends Document {
   role: "owner" | "worker";
   van?: Types.ObjectId | null;
   createdAt: Date;
+  expoPushTokens: string[];
 }
 
 const UserSchema: Schema<IUser> = new Schema({
@@ -22,7 +23,8 @@ const UserSchema: Schema<IUser> = new Schema({
         return this.role === "worker";
       },
     },
-  createdAt: { type: Date, default: Date.now }  
+  createdAt: { type: Date, default: Date.now },
+  expoPushTokens: { type: [String], default: [] }  
 });
 
 UserSchema.index({ role: 1, van: 1 }, { unique: true, partialFilterExpression: { role: "worker", van: { $type: "objectId" } } });

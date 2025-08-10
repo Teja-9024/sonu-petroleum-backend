@@ -3,6 +3,7 @@ import { Intake } from "./intake.model";
 import { Van } from "../van/van.model";
 import { AuthedRequest } from "../../middleware/auth";
 import { User } from "../user/user.model";
+import { sendExpoPush } from "../../services/push.service";
 
 export const addIntake = async (req: AuthedRequest, res: Response) => {
   try {
@@ -41,6 +42,23 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
       { $inc: { currentDiesel: litres, totalFilled: litres } }
     );  
 
+    const owners = await User.find({ role: "owner", expoPushTokens: { $exists: true, $ne: [] } })
+      .select("expoPushTokens");
+    const tokens = owners.flatMap(o => o.expoPushTokens);
+
+    await sendExpoPush(tokens, {
+      title: "New Intake Recorded",
+      body: `${workerDoc!.name} filled ${litres} L in ${van.vanNo} (${pumpName})`,
+      data: {
+        type: "intake",
+        vanNo: van.vanNo,
+        litres,
+        amount,
+        pumpName,
+        dateTime: (dateTime ? new Date(dateTime) : new Date()).toISOString(),
+      },
+    });
+
     res.json({ message: 'Intake recorded', data: intake });
   } catch (error) {
     res.status(500).json({ message: "Error creating intake entry", error });
@@ -74,6 +92,8 @@ export const getIntakes = async (req: AuthedRequest, res: Response) => {
       count: intakes.length,
       data: intakes
     });
+
+    
   } catch (error) {
     console.error("Error fetching intakes:", error);
     return res.status(500).json({ message: "Error fetching intakes", error });
