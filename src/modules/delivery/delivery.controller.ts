@@ -26,11 +26,25 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
       van = await Van.findOne({ vanNo: bodyVanNo });
       if (!van) return res.status(400).json({ message: "Van not found" });
     }
-  const data = req.body;
+  
+    const litresNum = Number(litres);
+    const updatedVan = await Van.findOneAndUpdate(
+      { _id: van._id, currentDiesel: { $gte: litresNum } },           // guard
+      { $inc: { currentDiesel: -litresNum, totalDelivered: litresNum } }, // atomic
+      { new: true }
+    );
+
+    if (!updatedVan) {
+      // Guard failed → jitna available hai, woh bata do
+      const fresh = await Van.findById(van._id).select("currentDiesel").lean();
+      return res.status(500).json({
+        message: `Not enough diesel in van. Available: ${fresh?.currentDiesel ?? 0} L`
+      });
+    }
 
   const delivery = new Delivery({
-    van: van._id,
-    vanNo: van.vanNo,
+    van: updatedVan._id,
+    vanNo: updatedVan.vanNo,
     worker: workerDoc!._id,
     workerName: workerDoc!.name,
     supplier,
@@ -41,10 +55,10 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
   });
   await delivery.save();
 
-  await Van.updateOne(
-    { _id: van._id },
-    { $inc: { currentDiesel: -litres, totalDelivered: litres } }
-  );
+  // await Van.updateOne(
+  //   { _id: van._id },
+  //   { $inc: { currentDiesel: -litres, totalDelivered: litres } }
+  // );
 
 
     await createOwnerNotifications({

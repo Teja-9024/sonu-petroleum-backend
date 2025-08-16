@@ -5,6 +5,8 @@ export const intakeSchema = z.object({
     vanNo: z.string().min(1, "Van is required").optional(),
     // worker: z.string().min(1, "Worker name is required"),
     pumpName: z.string().min(1, "Pump name is required"),
+    sourceType: z.string().min(1, "sourceType name is required"),
+    sourceName: z.string().min(1, "sourceName name is required"),
     litres: z.number().min(1, "Litres must be positive"),
     amount: z.number().min(1, "Amount must be positive"),
     dateTime: z.string().min(1, "Date is required").optional(),

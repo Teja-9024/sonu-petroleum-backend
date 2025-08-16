@@ -11,7 +11,7 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
     // const { user } = req;
      const { user } = req;
     if (!user) return res.status(401).json({ message: "Unauthorized" });
-    const { pumpName, litres, amount, dateTime, vanNo: bodyVanNo } = req.body;
+    const { pumpName, sourceType, sourceName, litres, amount, dateTime, vanNo: bodyVanNo } = req.body;
     let van = null;
     let workerDoc = await User.findById(user.userId);
 
@@ -26,22 +26,43 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
       if (!van) return res.status(400).json({ message: "Van not found" });
     }
 
+    const litresNum = Number(litres);
+    const updatedVan = await Van.findOneAndUpdate(
+      {
+        _id: van._id,
+        $expr: { $lte: [ { $add: ["$currentDiesel", litresNum] }, "$capacity" ] }
+      },
+      { $inc: { currentDiesel: litresNum, totalFilled: litresNum } },
+      { new: true }
+    );
+
+    if (!updatedVan) {
+      // Guard failed → compute available space & return clean message
+      const fresh = await Van.findById(van._id).select("capacity currentDiesel").lean();
+      const available = Math.max(0, (fresh?.capacity ?? 0) - (fresh?.currentDiesel ?? 0));
+      return res.status(500).json({
+        message: `Intake would exceed van capacity. Available space: ${available} L`
+      });
+    }
+
     const intake = new Intake({
-      van: van._id,
-      vanNo: van.vanNo,
+      van: updatedVan._id,
+      vanNo: updatedVan.vanNo,
       worker: workerDoc!._id,
       workerName: workerDoc!.name,
       pumpName,
+      sourceType,
+      sourceName,
       litres,
       amount,
       dateTime: dateTime ? new Date(dateTime) : new Date()
     });
     await intake.save();
 
-    await Van.updateOne(
-      { _id: van._id },
-      { $inc: { currentDiesel: litres, totalFilled: litres } }
-    );  
+    // await Van.updateOne(
+    //   { _id: van._id },
+    //   { $inc: { currentDiesel: litres, totalFilled: litres } }
+    // );  
 
 
     // 1) DB inbox create

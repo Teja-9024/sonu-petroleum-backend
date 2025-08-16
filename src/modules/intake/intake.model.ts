@@ -6,6 +6,8 @@ export interface IIntake extends Document {
   worker: Types.ObjectId;
   workerName: string; 
   pumpName: string;
+  sourceType: string;
+  sourceName: string;
   litres: number;
   amount: number; 
   dateTime: Date;
@@ -18,6 +20,8 @@ const IntakeSchema: Schema<IIntake> = new Schema({
   worker: { type: Schema.Types.ObjectId, ref: "User", required: true },
   workerName: { type: String, required: true },
   pumpName: { type: String, required: true },
+  sourceType: { type: String, required: true},
+  sourceName: { type: String, required: true },
   litres: { type: Number, required: true },
   amount: { type: Number, required: true },
   dateTime: { type: Date, required: true },
