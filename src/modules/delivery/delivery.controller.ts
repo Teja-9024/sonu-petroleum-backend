@@ -14,17 +14,19 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
     const { supplier, customer, litres, amount, dateTime, vanNo: bodyVanNo } = req.body;
 
     let van = null;
-    let workerDoc = await User.findById(user.userId);
-
+    let workerDoc = null;
     console.log("user.role:", user.role)
     if (user.role === "worker") {
       if (!user.vanId) return res.status(400).json({ message: "Worker has no van assigned" });
       van = await Van.findById(user.vanId);
       if (!van) return res.status(400).json({ message: "Assigned van not found" });
+      workerDoc = await User.findById(user.userId);
     } else {
       if (!bodyVanNo) return res.status(400).json({ message: "vanNo is required for owner" });
-      van = await Van.findOne({ vanNo: bodyVanNo });
+      van = await Van.findOne({ vanNo: bodyVanNo }).populate<{ assignedWorker: { _id: string; name: string } | null }>("assignedWorker", "_id name");;
       if (!van) return res.status(400).json({ message: "Van not found" });
+       workerDoc = van.assignedWorker;
+      
     }
   
     const litresNum = Number(litres);

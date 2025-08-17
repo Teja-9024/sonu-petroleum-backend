@@ -25,6 +25,7 @@ export const addIntake = async (req: AuthedRequest, res: Response) => {
       van = await Van.findOne({ vanNo: bodyVanNo });
       if (!van) return res.status(400).json({ message: "Van not found" });
     }
+    console.log("teja")
 
     const litresNum = Number(litres);
     const updatedVan = await Van.findOneAndUpdate(
