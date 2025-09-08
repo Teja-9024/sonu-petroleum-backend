@@ -23,7 +23,7 @@ export const createDelivery = async (req: AuthedRequest, res: Response) => {
       workerDoc = await User.findById(user.userId);
     } else {
       if (!bodyVanNo) return res.status(400).json({ message: "vanNo is required for owner" });
-      van = await Van.findOne({ vanNo: bodyVanNo }).populate<{ assignedWorker: { _id: string; name: string } | null }>("assignedWorker", "_id name");;
+      van = await Van.findOne({ vanNo: bodyVanNo }).populate<{ assignedWorker: { _id: string; name: string } | null }>("assignedWorker", "_id name");
       if (!van) return res.status(400).json({ message: "Van not found" });
        workerDoc = van.assignedWorker;
       
